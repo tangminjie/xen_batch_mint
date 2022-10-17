@@ -27,11 +27,11 @@ https://github.com/sc-forks/solidity-coverage
 **ps:gas测试以批量claim 10个账号进行**
 
 1. 第一次gas：
-Deployments   1294765
-batchMint   8876234
-batchClaimWithXenContract 824657
+Deployments   1294765 
+batchMint   8876234 
+batchClaimWithXenContract 824657 
 
-![gasTest_1](./photo/gasTesst-1.jpg)
+![gasTest_1](./photo/gasTest-1.jpg)
 
 2. 第二次优化测试gas
 Deployments   1089690
@@ -42,14 +42,15 @@ batchClaimWithXenContract 507895
 mint gas 减少了 170W 
 期间踩了一个`create2`的坑：`create2` 创建的合约如果构造函数里有传入参数，或者对immutable 进行赋值后，合约的byteCode会改变，用于计算地址的`type(xenCallV2).creationCode)` 是不匹配的
 解决方案：将参数 encode进字节码中，例：  `keccak256(abi.encodePacked(type(Pair).creationCode,abi.encode(_factoryAddress)))`
-![gasTest_2](./photo/gasTesst-2.jpg)
+![gasTest_2](./photo/gasTest-2.jpg)
 
 3. 第三次优化测试 
-Deployments   845100
-batchMint   4939607
-batchClaimWithXenContract 577844
-修改使用proxy进行create2 并且使用call abi.encodeWithSignature(function)进行XEN调用
-![gasTest_3](./photo/gasTesst-3.jpg)
+Deployments   845100 
+batchMint   4939607 
+batchClaimWithXenContract 577844 
+修改使用proxy进行create2 并且使用call abi.encodeWithSignature(function)进行XEN调用 
+
+![gasTest_3](./photo/gasTest-3.jpg)
 
 4. 第四次优化测试
 
@@ -58,7 +59,8 @@ batchMint   1960177
 batchClaimWithXenContract 585149
 安装gasPrice 2.5Gwei，ETH 1300U 计算， mint 10次总共花费 0.0049004425ETH 约等于 6.3U
 相比于mint 10次只需要原本一次的gas费用
-![gasTest_4](./photo/gasTesst-4.jpg)
+
+![gasTest_4](./photo/gasTest-4.jpg)
 
 使用miniproxy
 EIP-1167，又称 Minimal Proxy Contract，提供了一种低成本复制合约的方法。具体介绍: `https://mirror.xyz/xyyme.eth/mmUAYWFLfcHGCEFg8903SweY3Sl-xIACZNDXOJ3twz8`
@@ -66,14 +68,14 @@ EIP-1167，又称 Minimal Proxy Contract，提供了一种低成本复制合约�
 
 ### 压力测试
 1. mint 100
-batchMint   18989296
-batchClaimWithXenContract 5184060
+batchMint   18989296 
+batchClaimWithXenContract 5184060 
 
-1. mint 150
-batchMint   28450011
-batchClaimWithXenContract 7740348
+1. mint 150 
+batchMint   28450011 
+batchClaimWithXenContract 7740348 
 
-从以太坊区块浏览器上可以知道目前区块最大gaslimit 3000W
+从以太坊区块浏览器上可以知道目前区块最大gaslimit 3000W 
 
 使用我们最大打包的交易次数为157次。
 
