@@ -40,7 +40,7 @@ contract GET{
         selfdestruct(payable(tx.origin));
     }
 }
-/// @author 捕鲸船社区 加入社区添加微信:Whaler_man 关注推特 @Whaler_DAO
+
 contract GETXEN {
     mapping (address=>mapping (uint256=>address[])) public userContracts;
     IXEN2 private constant xen = IXEN2(0xBDE5AbC1c689BaA94ac91eE1328064c59712418B);

@@ -13,7 +13,7 @@ async function increaseTime(value) {
     await ethers.provider.send('evm_mine');
 }
 
-describe("xenAttack", function () {
+describe("xenAttackV2", function () {
     async function deployOneYearLockFixture() {
         // Contracts are deployed using the first signer/account by default
         const [owner, otherAccount] = await ethers.getSigners();
@@ -22,10 +22,10 @@ describe("xenAttack", function () {
         // console.log("otherAccount eth balance: ",ethers.utils.formatEther(await otherAccount.getBalance()));
 
         const xenContractAddress = '0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8';
-        const XenAttack = await ethers.getContractFactory("xenAttack");
-        const xenAttack = await XenAttack.deploy(xenContractAddress);
+        const XenAttackV2 = await ethers.getContractFactory("xenAttackV2");
+        const xenAttackV2 = await XenAttackV2.deploy(xenContractAddress);
 
-        return { xenAttack, owner, otherAccount,xenContractAddress };
+        return { xenAttackV2, owner, otherAccount,xenContractAddress };
     }
 
     describe("test fork mainner",function(){
@@ -45,41 +45,37 @@ describe("xenAttack", function () {
     });
     describe("Compared xenContract address", function () {
         it("Should batchMint", async function () {
-            const { xenAttack,xenContractAddress } = await loadFixture(deployOneYearLockFixture);
+            const { xenAttackV2,xenContractAddress } = await loadFixture(deployOneYearLockFixture);
             //console.log(xenContractAddress);
-            expect(await xenAttack.xenContractAddress()).to.equal(xenContractAddress);
+            expect(await xenAttackV2.xenContractAddress()).to.equal(xenContractAddress);
           });
     });
 
     // describe("batch mintRank test",function(){
     //     it("batchMint with term < 0 ",async function(){
-    //         const { xenAttack,owner,otherAccount,xenContractAddress } = await loadFixture(deployOneYearLockFixture);
-    //         expect(await xenAttack.connect(otherAccount).batchMint(10,-1)).to.be.revertedWith("termDat error!");
+    //         const { xenAttackV2,owner,otherAccount,xenContractAddress } = await loadFixture(deployOneYearLockFixture);
+    //         expect(await xenAttackV2.connect(otherAccount).batchMint(10,-1)).to.be.revertedWith("termDat error!");
     //     });
     // });
 
     describe("batch Claim test",function(){
         it("batchClaimWithXenContract call",async function(){
-            const { xenAttack,owner,otherAccount,xenContractAddress } = await loadFixture(deployOneYearLockFixture);
-            let tx = await xenAttack.connect(otherAccount).batchMint(10,1);
+            const { xenAttackV2,owner,otherAccount,xenContractAddress } = await loadFixture(deployOneYearLockFixture);
+            let tx = await xenAttackV2.connect(otherAccount).batchMint(10,1);
             console.log(tx);
-            const XenETHAddress =  '0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8';
-            const contractXEN =  new ethers.Contract(XenETHAddress ,abi , otherAccount);
+            
+            const contractXEN =  new ethers.Contract(xenContractAddress ,abi , otherAccount);
             const userInfo = await contractXEN.userMints(otherAccount.address);
             console.log(userInfo);
+
            // console.log(`userInfo rerm:${userInfo.term}, userInfo rank: ${userInfo.rank}`);
             // increase and mine time so we can claimReward
             await increaseTime(24*60*60);
             //claim and transfer xen
-            await xenAttack.connect(otherAccount).batchClaimWithXenContract();
-            await xenAttack.connect(otherAccount).withdrawForXenCallContract();
-
-            console.log("otherAccountBalance: ",ethers.utils.formatEther(
-                await contractXEN.balanceOf(otherAccount.address)
-            ));
+            await xenAttackV2.connect(otherAccount).batchClaimWithXenContract();
 
             expect(await contractXEN.balanceOf(otherAccount.address)).to.greaterThan(0);
-            console.log("XEN balance: ", (await contractXEN.balanceOf(otherAccount.address)).toString());
+            console.log("XEN balance: ", ethers.utils.formatEther(await contractXEN.balanceOf(otherAccount.address)).toString());
             
         });
     });
